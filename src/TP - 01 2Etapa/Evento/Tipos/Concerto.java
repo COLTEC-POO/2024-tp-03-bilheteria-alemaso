@@ -8,5 +8,14 @@ public class Concerto extends Evento{
         super(nome, data, local, preco);
         this.qtdIngressos = 150;
     }
-    
+
+    @Override
+    public String toString() {
+        String s =
+                "Concerto " + nome + "\n" +
+                "Data: " + data + "\n" +
+                "Local: " + local + "\n" +
+                "Preço do ingresso: R$" + preco;
+        return s;
+    }
 }
