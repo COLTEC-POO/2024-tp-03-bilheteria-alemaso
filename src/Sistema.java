@@ -1,3 +1,6 @@
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import Evento.Evento;
@@ -56,35 +59,46 @@ public class Sistema{
         String tipoEvento;
         String nomeEvento;
         String localEvento;
-        Date dataEvento;
+        Date dataEvento = null;
         float precoIngresso;
+        String data_evento;
+       SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy , HH:mm");
+
 
         String [] itens = {"Concerto", "Filme", "Teatro"};
         tipoEvento = JOptionPane.showInputDialog(null, "Escolha o tipo de evento a ser cadastrado", "Cadastro", JOptionPane.INFORMATION_MESSAGE, null, itens, itens[0]).toString();
         nomeEvento = JOptionPane.showInputDialog("Digite o nome do evento :");
         localEvento = JOptionPane.showInputDialog("Digite o local do evento :");
+        data_evento = JOptionPane.showInputDialog("Informe a data do Evento no formato : dd/MM//yyyy , HH:mm :");
+        try
+        {
+            dataEvento = formato.parse(data_evento);
+        }
+        catch(ParseException z)
+        {
+            z.printStackTrace();
+        }
+
         do {
             precoIngresso = Float.parseFloat(JOptionPane.showInputDialog("Digite o preço do ingresso:"));
         } while (precoIngresso < 0);
 
-        int[] data = {10,8,24,23,59}; //Solução provisória pra data. Temos que transformar um input do usuario pro formato DD/MM/AA/hh/mm (int[4])
-
         Evento e;
         switch (tipoEvento) {
             case "Concerto":
-                e = new Concerto(nomeEvento, data, localEvento, precoIngresso);
+                e = new Concerto(nomeEvento, dataEvento, localEvento, precoIngresso);
                 break;
 
             case "Filme":
-                e = new Filme(nomeEvento, data, localEvento, precoIngresso);
+                e = new Filme(nomeEvento, dataEvento, localEvento, precoIngresso);
                 break;
 
             case "Teatro":
-                e = new Teatro(nomeEvento, data, localEvento, precoIngresso);
+                e = new Teatro(nomeEvento, dataEvento, localEvento, precoIngresso);
                 break;
 
             default: // Esse caso nunca acontece, está aqui para burlar o java
-                e = new Concerto(nomeEvento, data, localEvento, precoIngresso);
+                e = new Concerto(nomeEvento, dataEvento, localEvento, precoIngresso);
                 break;
         }
         return e;
@@ -93,7 +107,7 @@ public class Sistema{
     void mostrarEventos(Evento[] eventos, int numEventos){
         String s = "";
         for (int i = 0; i < numEventos; i++){
-            s += eventos[i].toString(); // Pequeno erro na formatação da data e muitas casas decimais em preços quebrados
+            s += eventos[i].toString(); 
             if (i == numEventos - 1) // Tira o último espaço
                 break;
             s += "\n\n";
@@ -105,11 +119,11 @@ public class Sistema{
         String[] itens = new String[numEventos];
         for(int i = 0; i < numEventos; i++) {
             itens[i] = eventos[i].getNome();
+            
         }
 
         JOptionPane.showInputDialog(null, "Selecione o evento", "Compra de ingressos", JOptionPane.INFORMATION_MESSAGE, null, itens, itens[0]);
         // Tem que achar um jeito de transformar esse input no índice de eventos[] pra podermos usar nacompra de ingressos
-
         // Compra ingressos aqui
     }
 

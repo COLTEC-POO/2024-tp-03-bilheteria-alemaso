@@ -5,10 +5,10 @@ import Ingresso.*;
 
 public class Meia_Entrada extends Ingresso {
 
-    protected int preco;
+    protected float preco;
     protected char tipo;
 
-    public Meia_Entrada(Date dataVenda , int preco , char type)
+    public Meia_Entrada(Date dataVenda , float preco , char type)
     {
         super(dataVenda);
         this.preco = preco;

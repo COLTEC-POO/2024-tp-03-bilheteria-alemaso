@@ -1,12 +1,15 @@
 package Evento.Tipos;
 
 import Evento.*;
+import java.util.*;
 
 public class Concerto extends Evento{
 
-    public Concerto(String nome, int[] data, String local, double preco) {
+    public Concerto(String nome, Date data, String local, float preco) {
         super(nome, data, local, preco);
-        this.qtdIngressos = 150;
+        this.qtdIngressos = 100;
+        this.qtdIngressos_VIP = 15;
+        this.qtdMeia_Entrada = 35;
     }
 
     @Override
