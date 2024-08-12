@@ -2,14 +2,12 @@ package Evento.Tipos;
 
 import Evento.*;
 import java.util.*;
-
 public class Concerto extends Evento{
 
-    public Concerto(String nome, Date data, String local, float preco) {
+    public Concerto(String nome, Date data, String local, double preco) {
         super(nome, data, local, preco);
-        this.qtdIngressos = 100;
-        this.qtdIngressos_VIP = 15;
-        this.qtdMeia_Entrada = 35;
+        this.qtdIngressos = 150;
+        maxIngressos[2] = 15;
     }
 
     @Override
@@ -19,6 +17,23 @@ public class Concerto extends Evento{
                 "Data: " + data + "\n" +
                 "Local: " + local + "\n" +
                 "Preço do ingresso: R$" + preco;
+        return s;
+    }
+
+    @Override
+    public double calculaReceita() {
+        double total = 0;
+        for (int i = 0; i < totalIngressosVendidos; i++){
+            if (ingressos[i] !=null) total += ingressos[i].calculaReceita();
+        }
+        return total;
+    }
+
+    @Override
+    public String exibeExtrato() {
+        String s = "Concerto " + nome + "\n" +
+                "Total de ingressos vendidos: " + totalIngressosVendidos + "\n" +
+                "Receita total gerada: R$" + calculaReceita() + "\n";
         return s;
     }
 }
