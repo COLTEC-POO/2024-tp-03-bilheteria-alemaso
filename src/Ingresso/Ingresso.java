@@ -2,14 +2,12 @@ package Ingresso;
 
 import java.util.*;
 
-public abstract class Ingresso {
+public abstract class Ingresso implements Receita{
     protected Date dataVenda;
-    protected double valor;
+    protected double preco;
 
-    public Ingresso(Date data) {
+    public Ingresso(Date data, Double preco) {
         this.dataVenda = data;
-        this.valor = valor;
+        this.preco = preco;
     }
-
-    abstract protected int calculaMaximo();
 }
