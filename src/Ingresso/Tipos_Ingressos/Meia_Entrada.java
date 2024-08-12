@@ -5,18 +5,21 @@ import Ingresso.*;
 
 public class Meia_Entrada extends Ingresso {
 
-    protected float preco;
-    protected char tipo;
+    protected double preco;
 
-    public Meia_Entrada(Date dataVenda , float preco , char type)
+    public Meia_Entrada(Date dataVenda , double preco)
     {
-        super(dataVenda);
-        this.preco = preco;
-        this.tipo = type;
+        super(dataVenda, preco);
     }
 
     @Override
-    public int calculaMaximo() {
-        return 0;
+    public double calculaReceita() {
+        return preco / 2;
+    }
+
+    @Override
+    public String exibeExtrato() {
+        String s = "Meia entrada - " + dataVenda + " - R$" + calculaReceita();
+        return s;
     }
 }
