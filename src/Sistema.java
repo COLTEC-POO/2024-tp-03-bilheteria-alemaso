@@ -1,14 +1,17 @@
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import Evento.Evento;
 import Evento.Tipos.Concerto;
 import Evento.Tipos.Teatro;
 import Evento.Tipos.Filme;
-import javax.swing.JOptionPane;
+import Ingresso.Ingresso;
+import Ingresso.Tipos_Ingressos.IngressoVIP;
+import Ingresso.Tipos_Ingressos.Ingresso_Normal;
+import Ingresso.Tipos_Ingressos.Meia_Entrada;
 
+import javax.swing.JOptionPane;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 public class Sistema{
 
     public static void main(String[] args) {
@@ -21,8 +24,9 @@ public class Sistema{
 
         boolean sair = false;
         do{
-            String[] itens = {"Cadastrar eventos", "Comprar ingressos", "Mostrar eventos", "Mostrar ingressos", "Relatorio de receitas", "Encerrar o sistema"};
-            String opcao = JOptionPane.showInputDialog(null, "Escolha uma ação", "Bilheteria", JOptionPane.INFORMATION_MESSAGE, null, itens, itens[0]).toString();
+            String[] itens = {"Cadastrar eventos", "Comprar ingressos", "Mostrar eventos", "Relatorio de receitas", "Encerrar o sistema"};
+            String opcao = JOptionPane.showInputDialog(null, "Escolha uma ação", "Bilheteria",
+                    JOptionPane.INFORMATION_MESSAGE, null, itens, itens[0]).toString();
 
             switch (opcao) {
                 case "Cadastrar eventos":
@@ -36,10 +40,6 @@ public class Sistema{
 
                 case "Mostrar eventos":
                     bilheteria.mostrarEventos(eventos, numEventos);
-                    break;
-
-                case "Mostrar ingressos":
-                    bilheteria.mostrarIngressos(eventos, numEventos);
                     break;
 
                 case "Relatorio de receitas":
@@ -62,13 +62,14 @@ public class Sistema{
         Date dataEvento = null;
         float precoIngresso;
         String data_evento;
-       SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy , HH:mm");
-
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy , HH:mm");
 
         String [] itens = {"Concerto", "Filme", "Teatro"};
-        tipoEvento = JOptionPane.showInputDialog(null, "Escolha o tipo de evento a ser cadastrado", "Cadastro", JOptionPane.INFORMATION_MESSAGE, null, itens, itens[0]).toString();
+        tipoEvento = JOptionPane.showInputDialog(null, "Escolha o tipo de evento a ser cadastrado", "Cadastro",
+                JOptionPane.INFORMATION_MESSAGE, null, itens, itens[0]).toString();
         nomeEvento = JOptionPane.showInputDialog("Digite o nome do evento :");
         localEvento = JOptionPane.showInputDialog("Digite o local do evento :");
+
         data_evento = JOptionPane.showInputDialog("Informe a data do Evento no formato : dd/MM//yyyy , HH:mm :");
         try
         {
@@ -82,6 +83,7 @@ public class Sistema{
         do {
             precoIngresso = Float.parseFloat(JOptionPane.showInputDialog("Digite o preço do ingresso:"));
         } while (precoIngresso < 0);
+
 
         Evento e;
         switch (tipoEvento) {
@@ -107,52 +109,147 @@ public class Sistema{
     void mostrarEventos(Evento[] eventos, int numEventos){
         String s = "";
         for (int i = 0; i < numEventos; i++){
-            s += eventos[i].toString(); 
-            if (i == numEventos - 1) // Tira o último espaço
-                break;
-            s += "\n\n";
+            s += "================================\n";
+            s += eventos[i].toString(); // Pequeno erro na formatação da data e muitas casas decimais em preços quebrados
+
+            int ingressosDisponiveis = eventos[i].getQtdIngressos();
+            ingressosDisponiveis -= eventos[i].getTotalIngressosVendidos();
+
+            s += "\nNúmero de ingressos disponíveis: " + ingressosDisponiveis;
+
+            int[] maxIngressos = eventos[i].getMaxIngressos();
+            for (int j = 0; j < 3; j ++){
+                if(maxIngressos[j] > -1){
+                    if (j == 1) {
+                        s += "\nMeia-entradas disponíveis: ";
+                    } else if (j == 2) {
+                        s += "\nIngressos VIP disponíveis: ";
+                    }
+
+                    if (maxIngressos[j] < ingressosDisponiveis) {
+                        s += maxIngressos[j] + "\n";
+                    } else {
+                        s += ingressosDisponiveis + "\n";
+                    }
+                }
+            }
+
+            if (i == numEventos - 1)
+                s += "================================\n";
         }
         JOptionPane.showMessageDialog(null, s);
     }
 
     void comprarIngressos(Evento[] eventos, int numEventos){
-        String[] itens = new String[numEventos];
+        String[] opcoesEvento = new String[numEventos];
         for(int i = 0; i < numEventos; i++) {
-            itens[i] = eventos[i].getNome();
-            
+            opcoesEvento[i] = eventos[i].getNome();
         }
 
-        JOptionPane.showInputDialog(null, "Selecione o evento", "Compra de ingressos", JOptionPane.INFORMATION_MESSAGE, null, itens, itens[0]);
-        // Tem que achar um jeito de transformar esse input no índice de eventos[] pra podermos usar nacompra de ingressos
-        // Compra ingressos aqui
-    }
+        String item = JOptionPane.showInputDialog(null, "Selecione o evento", "Compra de ingressos",
+                JOptionPane.INFORMATION_MESSAGE, null, opcoesEvento, opcoesEvento[0]).toString();
 
-    void mostrarIngressos(Evento[] eventos, int numEventos){
-        String s = "";
-        for (int i = 0; i < numEventos; i++){
-            s += eventos[i].getNome();
+        int indiceEvento = -1;
+        if (item != null) {
+            for (int i = 0; i < numEventos; i++) {
+                if (item == opcoesEvento[i]) {
+                    indiceEvento = i;
+                    break;
+                }
+            }
+        }
 
-            // A quantidade e tipo de cada ingresso disponível vai aqui
+        String[] opcoesIngresso = {"Normal", "Meia", "VIP"};
+        item = JOptionPane.showInputDialog(null, "Selecione o tipo de ingresso", "Compra de ingressos",
+                JOptionPane.INFORMATION_MESSAGE, null, opcoesIngresso, opcoesIngresso[0]).toString();
 
-            if (i == numEventos - 1) // Tira o último espaço
+        int indiceTipoIngresso = -1;
+        for (int i = 0; i < opcoesIngresso.length; i++) {
+            if (item == opcoesIngresso[i]) {
+                indiceTipoIngresso = i;
                 break;
-            s += "\n\n";
+            }
         }
-        JOptionPane.showMessageDialog(null, s);
+
+        int numIngressosComprados = Integer.parseInt(JOptionPane.showInputDialog("Digite a quantidade de ingressos a serem comprados:"));
+
+        if ((eventos[indiceEvento].getMaxIngressos()[indiceTipoIngresso] >= numIngressosComprados
+                || eventos[indiceEvento].getMaxIngressos()[indiceTipoIngresso] == -1)
+                && eventos[indiceEvento].getTotalIngressosVendidos() + numIngressosComprados <= eventos[indiceEvento].getQtdIngressos() ){ // Sucesso na compra
+
+            //Atualiza o array com o novo máximo de ingressos
+            int[] novoMaximo = eventos[indiceEvento].getMaxIngressos();
+            novoMaximo[indiceTipoIngresso] -= numIngressosComprados;
+            eventos[indiceEvento].setMaxIngressos(novoMaximo);
+
+            //Instancia o numero ingressos comprados no array de ingressos com sua respectiva subclasse
+            Ingresso[] ingressos = new Ingresso[eventos[indiceEvento].getQtdIngressos()];
+//            Ingresso[] ingressos = Arrays.copyOf(eventos[indiceEvento].getIngressos(), eventos[indiceEvento].getQtdIngressos());
+            switch (indiceTipoIngresso){
+                case 0:
+                    for (int i = 0; i < numIngressosComprados; i++){
+                        ingressos[eventos[indiceEvento].getTotalIngressosVendidos()] = new Ingresso_Normal(new Date(), eventos[indiceEvento].getPreco());
+                    }
+                    break;
+
+                case 1:
+                    for (int i = 0; i < numIngressosComprados; i++){
+                        ingressos[eventos[indiceEvento].getTotalIngressosVendidos()] = new Meia_Entrada(new Date(), eventos[indiceEvento].getPreco());
+                    }
+                    break;
+
+                case 2:
+                    for (int i = 0; i < numIngressosComprados; i++){
+                        ingressos[eventos[indiceEvento].getTotalIngressosVendidos()] = new IngressoVIP(new Date(), eventos[indiceEvento].getPreco());
+                    }
+                    break;
+            }
+
+            eventos[indiceEvento].setTotalIngressosVendidos(eventos[indiceEvento].getTotalIngressosVendidos() + 1); // ingressosVendidos++
+
+            eventos[indiceEvento].setIngressos(ingressos);
+            JOptionPane.showMessageDialog(null, "Compra realizada com sucesso!");
+        } else {
+            JOptionPane.showMessageDialog(null, "Falha na compra: sem ingressos disponíveis.");
+        }
     }
 
     void relatorioDeReceitas(Evento[] eventos, int numEventos){
         String s = "";
-        double total = 0;
-        for (int i = 0; i < numEventos; i++){
-            s += eventos[i].getNome();
-
-            // A receita gerada por cada evento vai aqui
-            // total += evento[i].calculaReceita();
-
-            s += "\n\n";
+        String[] opcoesEvento = new String[numEventos + 1];
+        for(int i = 0; i < numEventos; i++) {
+            opcoesEvento[i] = eventos[i].getNome();
         }
-        s += "Total de receita acumulada: R$" + total;
+
+        opcoesEvento[numEventos] = "Relatório geral";
+        String item = (String) JOptionPane.showInputDialog(null, "Selecione o evento", "Compra de ingressos",
+                JOptionPane.INFORMATION_MESSAGE, null, opcoesEvento, opcoesEvento[0]);
+
+        int indiceEvento = numEventos;
+        for (int i = 0; i < numEventos; i++) {
+            if (item == opcoesEvento[i]) {
+                indiceEvento = i;
+                break;
+            }
+        }
+
+//        System.out.println(indiceEvento);
+//        System.out.println(eventos[0].getTotalIngressosVendidos());
+//        System.out.println(eventos[0].getIngressos()[0].calculaReceita());
+        if (indiceEvento == numEventos) { // Relatório geral
+            double total = 0;
+            for (int i = 0; i < numEventos; i++){
+                total += eventos[i].calculaReceita();
+                s += eventos[i].exibeExtrato() + "\n";
+            }
+            s += "Renda total acumulada: R$" + total;
+        } else { // Relatório de evento
+            s += eventos[indiceEvento].exibeExtrato() + "\n";
+            for (int i = 0 ; i < eventos[indiceEvento].getTotalIngressosVendidos(); i++){
+                s += eventos[indiceEvento].getIngressos()[i].exibeExtrato() + "\n";
+            }
+        }
+
         JOptionPane.showMessageDialog(null, s);
     }
 
